@@ -2,18 +2,13 @@
 class exiscan::spamassassin (
   $trusted_networks     = $::ipaddress,
   $bayes_sql_dsn,
-  $bayes_sql_username,
-  $bayes_sql_password,
+  $bayes_sql_username   = 'spamassassin',
+  $bayes_sql_password   = 'spamassassin',
   $custom_rules_content = '',
   $custom_rules_source  = '') {
-  package { [
-    "spamassassin",
-    "libmail-dkim-perl",
-    "clamav-daemon",
-    "libclass-dbi-pg-perl",
-    "spf-tools-perl"]:
-    ensure => installed;
-  }
+  include exim
+
+  package { ["spamassassin", "libmail-dkim-perl", "clamav-daemon", "libclass-dbi-pg-perl", "spf-tools-perl"]: ensure => installed; }
 
   service { ["spamassassin", "clamav-freshclam", "clamav-daemon"]:
     ensure => running,
@@ -58,7 +53,7 @@ class exiscan::spamassassin (
       mode    => 0750,
       owner   => 'Debian-exim',
       group   => 'clamav',
-      require => [Package["exim4"], Package["clamav-daemon"]],
+      require => [Package[$exim::package], Package["clamav-daemon"]],
       notify  => Service["exim4"];
 
     "/var/spool/exim4/scan":
@@ -66,7 +61,7 @@ class exiscan::spamassassin (
       mode    => 2750,
       owner   => 'Debian-exim',
       group   => 'clamav',
-      require => [Package["exim4"], Package["clamav-daemon"]],
+      require => [Package[$exim::package], Package["clamav-daemon"]],
       notify  => Service["exim4"];
   }
 
