@@ -8,11 +8,14 @@ class exiscan::spamassassin (
   $custom_rules_source  = '') {
   include exim
 
-  package { ["spamassassin", "libmail-dkim-perl", "clamav-daemon", "libclass-dbi-pg-perl", "spf-tools-perl"]: ensure => installed; }
+  $spamd_packages = ["spamassassin", "libmail-dkim-perl", "clamav-daemon", "libclass-dbi-pg-perl", "spf-tools-perl"]
+
+  package { $spamd_packages: ensure => installed; }
 
   service { ["spamassassin", "clamav-freshclam", "clamav-daemon"]:
-    ensure => running,
-    enable => true;
+    ensure  => running,
+    enable  => true,
+    require => Package[$spamd_packages];
   }
 
   file {
@@ -31,6 +34,7 @@ class exiscan::spamassassin (
       mode    => 0644,
       owner   => root,
       group   => root,
+      require => Package["spamassassin"],
       notify  => Service["spamassassin"];
 
     "/etc/spamassassin/custom_rules.cf":
@@ -38,6 +42,7 @@ class exiscan::spamassassin (
       mode   => 0644,
       owner  => root,
       group  => root,
+      require => Package["spamassassin"],
       notify => Service["spamassassin"];
 
     "/var/run/spamd":
