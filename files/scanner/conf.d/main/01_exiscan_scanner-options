@@ -1,0 +1,47 @@
+## configure extended ACLs for checking incoming mail
+CHECK_RCPT_LOCAL_ACL_FILE = CONFDIR/acls/check_rcpt
+CHECK_DATA_LOCAL_ACL_FILE = CONFDIR/acls/check_data
+
+acl_smtp_connect  = exiscan_check_connect
+acl_smtp_helo     = exiscan_check_helo
+acl_smtp_dkim     = exiscan_check_dkim
+
+## Enable common DNS blacklists
+CHECK_RCPT_IP_DNSBLS = zen.spamhaus.org : dnsbl.dronebl.org : cbl.abuseat.org
+
+## configure interfaces for virus and spam scanning
+av_scanner = clamd:/var/run/clamav/clamd.ctl
+spamd_address = /var/run/spamd.sock
+
+## do require HELO/EHLO
+CHECK_MAIL_HELO_ISSUED = true
+
+## enable checks in the ACLs
+CHECK_RCPT_REVERSE_DNS = *
+CHECK_RCPT_POSTMASTER = postmaster
+
+## check spf at the mta level
+CHECK_RCPT_SPF = yes
+
+## Drop retarded Senders
+smtp_enforce_sync = true
+
+## Don't pipeline, this'll trip up badly written spam bots
+pipelining_advertise_hosts =
+
+## avoid bouncing the message body
+# This reduces the possibility to use us as spam bouncer
+bounce_return_body = false
+
+## these hosts need special attention
+# Add hosts to this list when you want to expose their policies
+# to your senders. On the up-side, this  
+# This may be used for hosts we are relaying for, but do not know
+# which mailboxes exist. 
+hostlist strict_from_to_hosts = lsearch*;/etc/exim4/strict_hosts
+
+## list of really local IPs to avoid MX spoofing in @mx_any
+hostlist localhosts = <; 127.0.0.1 ; ::1
+
+## list of trusted hosts which may circumvent some of the more technical blocks
+hostlist trusted_local = /etc/exim4/trusted_local_hosts

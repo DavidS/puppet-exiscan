@@ -1,0 +1,31 @@
+
+GREYLIST_ENABLED_GREY          = yes
+GREYLIST_INITIAL_DELAY         = 10 MINUTES
+GREYLIST_INITIAL_LIFETIME      = 4 HOURS
+GREYLIST_WHITE_LIFETIME        = 36 DAY
+GREYLIST_BOUNCE_LIFETIME       = 7 DAY
+GREYLIST_RECORD_LIFETIME       = 3 DAY
+GREYLIST_CLEAR_LIFETIME        = 90 DAY
+GREYLIST_TABLE                 = greylist
+
+.ifdef GREYLIST_ENABLED_GREY
+  GREYLIST_TEST      = SELECT CASE WHEN now() > block_expires THEN 'accepted' \
+                       ELSE 'deferred' END AS result, id FROM GREYLIST_TABLE \
+                       WHERE now() < record_expires \
+                       AND sender_type ILIKE ${if def:sender_address_domain{'NORMAL'}{'BOUNCE'}} \
+                       AND sender      ILIKE '${quote_pgsql:${if def:sender_address_domain{$sender_address_domain}{${domain:$h_from:}} }}' \
+                       AND recipient   ILIKE '${quote_pgsql:${if def:domain{$domain}{${domain:$h_to:}} }}' \
+                       AND relay_ip    ILIKE '${quote_pgsql:${mask:$sender_host_address/24}}' \
+                       ORDER BY result DESC LIMIT 1
+  GREYLIST_ADD       = DELETE FROM GREYLIST_TABLE  WHERE relay_ip = '${quote_pgsql:${mask:$sender_host_address/24}}'; \
+                       INSERT INTO GREYLIST_TABLE (relay_ip, sender_type, sender, recipient, block_expires, record_expires, create_time, type) VALUES \
+                       ('${quote_pgsql:${mask:$sender_host_address/24}}', ${if def:sender_address_domain{'NORMAL'}{'BOUNCE'}}, \
+                                   '${quote_pgsql:${if def:sender_address_domain{$sender_address_domain}{${domain:$h_from:}} }}', \
+                                   '${quote_pgsql:${if def:domain{$domain}{${domain:$h_to:}} }}', \
+                                   now() + 'GREYLIST_INITIAL_DELAY'::interval, now() + 'GREYLIST_INITIAL_LIFETIME'::interval,now(), 'AUTO');
+  GREYLIST_DEFER_HIT = UPDATE GREYLIST_TABLE SET blockcount=blockcount+1, last_block=now() WHERE id = $acl_m9
+  GREYLIST_OK_COUNT  = UPDATE GREYLIST_TABLE SET passcount=passcount+1, last_pass=now() WHERE id = $acl_m9
+  GREYLIST_OK_NEWTIME = UPDATE GREYLIST_TABLE SET record_expires = now() + 'GREYLIST_WHITE_LIFETIME'::interval WHERE id = $acl_m9 AND type='AUTO'
+  GREYLIST_OK_BOUNCE = UPDATE GREYLIST_TABLE SET record_expires = now() + 'GREYLIST_BOUNCE_LIFETIME'::interval WHERE id = $acl_m9 AND type='AUTO'
+  GREYLIST_CLEAN     = DELETE FROM GREYLIST_TABLE WHERE (record_expires < now() - 'GREYLIST_CLEAR_LIFETIME'::interval) AND (type='AUTO')
+.endif

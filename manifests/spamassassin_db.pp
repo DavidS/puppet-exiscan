@@ -3,9 +3,11 @@ class exiscan::spamassassin_db (
   $db_type        = postgres,
   $exim_ipaddress = '127.0.0.1',
   $db_name        = 'spamassassin',
-  $db_username    = 'spamassassin',
+  $db_username    = 'debian-spamd',
   $db_password,) {
   validate_re($db_type, '^postgres$')
+
+  $runtime_user = $db_username
 
   case $db_type {
     'postgres' : {
@@ -19,16 +21,14 @@ class exiscan::spamassassin_db (
       }
 
       file {
-        'spamassassin.opt.dir':
+        "/var/lib/spamd-dbimport":
           ensure => directory,
-          path   => '/opt/spamassassin',
-          owner  => root,
-          group  => root,
-          mode   => 644;
+          mode   => 0700,
+          owner  => $runtime_user;
 
         'spamassassin_3_2_2_initial.sql':
           ensure => present,
-          path   => '/opt/spamassassin/spamassassin_3_2_2_initial.sql',
+          path   => '/var/lib/spamd-dbimport/spamassassin_3_2_2_initial.sql',
           owner  => root,
           group  => root,
           mode   => 644,
@@ -36,11 +36,13 @@ class exiscan::spamassassin_db (
       }
 
       postgresql::import { 'spamassassin_3_2_2_initial':
-        source_url      => 'file:///opt/spamassassin/spamassassin_3_2_2_initial.sql',
+        source_url      => 'file:///var/lib/spamd-dbimport/spamassassin_3_2_2_initial.sql',
         database        => $db_name,
         extract_command => false,
-        user            => 'postgres',
-        # object_owner    => $db_username,
+        user            => $runtime_user,
+        log             => "/var/lib/spamd-dbimport/log",
+        errorlog        => "/var/lib/spamd-dbimport/errorlog",
+        flagfile        => "/var/lib/spamd-dbimport/flagfile",
         require         => [File['spamassassin_3_2_2_initial.sql'], Postgresql::Dbcreate[$db_name]],
       }
     }

@@ -1,0 +1,102 @@
+warn
+  log_message = beginning mime checking
+
+# Deny a Message if it contains a NUL Character
+deny
+  condition   = ${if >{$body_zerocount}{0} {yes}{no}}
+  message     = Message contains NUL character.
+  log_message = deny_nul_char: NUL char ($body_zerocount})
+  delay       = 20s
+
+# reject and delay messages with serious MIME container errors
+deny
+  message     = Found MIME error ($demime_reason[$demime_errorlevel])
+  log_message = deny_mime_error: Found MIME error ($demime_reason[$demime_errorlevel])
+  demime      = *
+  condition   = ${if >{$demime_errorlevel}{2}{1}{0}}
+  delay       = 20s
+
+# warn and delay for other errors
+warn
+  message     = X-MIME-Check: Found MIME error ($demime_reason[$demime_errorlevel])
+  log_message = warn_mime_error: Found MIME error ($demime_reason[$demime_errorlevel])
+  demime      = *
+  condition   = ${if >{$demime_errorlevel}{0}{1}{0}}
+  delay       = 5s
+
+# Reject known virus spreading file extensions.
+# Accepting these is pretty much braindead.
+deny
+  message     = contains .$found_extension file (blacklisted).
+  log_message = deny_extension: Found Blacklisted File Extension $found_extension
+  demime      = bat:com:lnk:pif:scr:vbs:ade:adep:asd:chm:cmd:cpl:crt:dll:hlp:hta:inf:isp:jse:ocx:pcd:reg:url
+  delay       = 20s
+
+# assert that the address list headers are syntactically correct.
+warn
+  message     = X-Header-Syntax-Check: unverifyable
+  log_message = warn_header_syntax: Message headers fail syntax check
+  !acl        = acl_local_deny_exceptions
+  !verify     = header_syntax
+
+# assert that there is a verifiable sender address in at least
+# one of the "Sender:", "Reply-To:", or "From:" header lines.
+warn
+  message     = X-Header-Sender-Check: unverifyable
+  log_message = warn_header_sender: No verifiable sender address in message headers
+  !acl        = acl_local_deny_exceptions
+  !verify     = header_sender
+
+# Deny if the message contains malware.
+deny
+  malware     = *
+  add_header  = X-Virus-Scan: scanned by ClamAV on $primary_hostname
+  message     = This message was detected as possible malware ($malware_name).
+  log_message = deny_malware: This message was detected as malware ($malware_name).
+  delay       = 20s
+
+warn
+  condition           = ${lookup{$sender_address_domain}lsearch{/etc/exim4/no_spamassassin_domains} {yes}{no}}
+  condition           = $acl_m_dkimbulkpass
+  set acl_m_knownbulk = yes
+  add_header          = X-Spam-Status: not scanned. known DKIM signing bulk sender ($sender_address_domain).
+  log_message         = warn_dkim_bulksender: known bulksender $sender_address_domain. not spending CPU cycles for spamassassin
+
+# Add headers to a message if it is judged to be spam. Before enabling this,
+# you must install SpamAssassin. You also need to set the spamd_address
+# option in the main configuration.
+#
+# Please note that this is only suiteable as an example. There are
+# multiple issues with this configuration method. For example, if you go
+# this way, you'll give your spamassassin daemon write access to the
+# entire exim spool which might be a security issue in case of a
+# spamassassin exploit.
+#
+# See the exim docs and the exim wiki for more suitable examples.
+#
+warn
+  !condition  = $acl_m_knownbulk
+  spam        = debian-spamd:true
+  add_header  = X-Spam_score: $spam_score\n\
+                X-Spam_score_int: $spam_score_int\n\
+                X-Spam_bar: $spam_bar\n\
+                X-Spam_report: $spam_report
+
+# Greylist the Host if we have a spamscore of over 3.0 but under 5.0
+defer
+  !condition  = $acl_m_knownbulk
+  condition   = ${if >{$spam_score_int}{30} {yes}{no}}
+  condition   = ${if <{$spam_score_int}{50} {yes}{no}}
+  hosts       = !+relay_from_hosts : !+trusted_local
+  acl         = local_greylist_acl
+  delay       = 10s
+  message     = GreyListed: please try again later
+  log_message = defer_greylist: Greylisted $sender_host_address because spam_score is between 3.0 and 5.0
+
+# Deny if we have a spamscore of over 5.0
+deny
+  message     = id=$h_message-id : Spam score too high ($spam_score)
+  log_message = deny_spam: id=$h_message-id : Spam score too high ($spam_score)
+  !condition  = $acl_m_knownbulk
+  condition   = ${if >{$spam_score_int}{50}{1}{0}}
+  delay       = 20s

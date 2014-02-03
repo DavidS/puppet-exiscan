@@ -1,0 +1,30 @@
+# main/01_exiscan_other-options
+
+# enable TLS/SSL
+MAIN_TLS_ENABLE = true
+# at least try to verify TLS connections
+MAIN_TLS_TRY_VERIFY_HOSTS = *
+
+# disable frozen notifications
+MAIN_FREEZE_TELL =
+
+# allow more concurrent smtp sessions
+smtp_accept_max = 250
+smtp_accept_queue_per_connection = 100
+
+## Maximum connections per sending host to accept
+smtp_accept_max_per_host = 5
+smtp_connect_backlog = 50
+smtp_receive_timeout = 15m
+
+# accept mails on ssmtp and submission ports too
+daemon_smtp_ports = smtp : submission : ssmtp
+# do ssl on connect on legacy ssmtp port
+tls_on_connect_ports = ssmtp
+
+# require TLS for AUTH
+auth_advertise_hosts = ${if or{ \
+      {!eq{$tls_cipher}{}} \
+      {!eq{$interface_port}{25}} \
+   }\
+   {*}{}}

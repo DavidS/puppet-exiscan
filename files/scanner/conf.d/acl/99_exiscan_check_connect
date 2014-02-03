@@ -1,0 +1,20 @@
+### acl/99_exiscan_local_check_connect
+
+# implement ratelimiting on incoming connections
+# also, keep the brake on for incoming connections to port 25: those are primarily machines
+exiscan_check_connect:
+  defer message = Sorry, too busy. Try again later.
+        ratelimit = 10 / 1s / $primary_hostname
+        hosts = !+relay_from_hosts : !+trusted_local
+        log_message = defer_ratelimit_remote: Ratelimit: REMOTE System rate limit exceeded for $primary_hostname - $sender_rate / $sender_rate_period DEFERRED
+
+  defer message = Sorry, too busy. Try again later.
+        ratelimit = 20 / 1s / $primary_hostname
+        hosts = +relay_from_hosts : !+trusted_local
+        log_message = defer_ratelimit_local: Ratelimit: LOCAL System rate limit exceeded for $primary_hostname - $sender_rate / $sender_rate_period DEFERRED
+
+  warn  hosts       = !+trusted_local
+        condition   = ${if eq{$received_port}{25} {1}{0}}
+        delay       = 1s
+
+  accept

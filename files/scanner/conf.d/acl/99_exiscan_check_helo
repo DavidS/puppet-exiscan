@@ -1,0 +1,52 @@
+### acl/99_exiscan_local_check_helo
+
+# This access control list is used for the HELO or EHLO command in 
+# an incoming SMTP transaction. The tests are run in order until the
+# greeting is either accepted or denied.
+
+exiscan_check_helo:
+  accept
+    hosts       = : 127.0.0.1 : 127.0.1.1 : +relay_from_hosts : +trusted_local
+    log_message = accept_helo: Accepting EHLO/HELO ($sender_helo_name): relay_from: $sender_host_address
+
+  warn
+    condition = ${if eq {$sender_helo_name}{}}
+    log_message = warn_no_helo: remote Host used no HELO/EHLO greeting
+    set acl_c_helo_delay = ${eval:${if >{$acl_c_helo_delay}{0}{$acl_c_helo_delay}{1}} + 5}
+    delay = ${if >{$acl_c_helo_delay}{0}{$acl_c_helo_delay}}s
+
+  warn
+    condition = ${if eqi {$sender_helo_name} {$sender_host_address}{no}{yes}}
+    condition = ${if isip {$sender_helo_name} {yes}{no}}
+    log_message = warn_ip_helo: remote Host used IP address in HELO/EHLO greeting
+    set acl_c_helo_delay = ${eval:${if >{$acl_c_helo_delay}{0}{$acl_c_helo_delay}{1}} + 5}
+    delay = ${if >{$acl_c_helo_delay}{0}{$acl_c_helo_delay}}s
+
+  warn
+    condition = ${if eq{$sender_helo_name}{[$interface_address]}{true}{false}}
+    log_message = warn_our_ip_helo: remote host used our ip in HELO/EHLO greeting
+    set acl_c_helo_delay = ${eval:${if >{$acl_c_helo_delay}{0}{$acl_c_helo_delay}{1}} + 5}
+    delay = ${if >{$acl_c_helo_delay}{0}{$acl_c_helo_delay}}s
+
+  warn
+    condition = ${if match{$sender_helo_name}{$primary_hostname}{yes}{no}}
+    log_message = warn_our_name_helo: remote host used our name in HELO/EHLO greeting
+    set acl_c_helo_delay = ${eval:${if >{$acl_c_helo_delay}{0}{$acl_c_helo_delay}{1}} + 5}
+    delay = ${if >{$acl_c_helo_delay}{0}{$acl_c_helo_delay}}s
+
+  warn
+    condition = ${if match_domain{$sender_helo_name}\
+                   {$primary_hostname:+local_domains:+virtual_domains}\
+                   {true}{false}}
+    log_message = warn_our_domain_helo: remote host used our name or one of our domains in HELO/EHLO greeting
+    set acl_c_helo_delay = ${eval:${if >{$acl_c_helo_delay}{0}{$acl_c_helo_delay}{1}} + 5}
+    delay = ${if >{$acl_c_helo_delay}{0}{$acl_c_helo_delay}}s
+
+  warn
+    condition = ${if match{$sender_helo_name}{\N^\[\N}{no}{yes}}
+    condition = ${if match{$sender_helo_name}{\N\.\N}{no}{yes}}
+    log_message = warn_invalid_helo: invalid helo name presented
+    set acl_c_helo_delay = ${eval:${if >{$acl_c_helo_delay}{0}{$acl_c_helo_delay}{1}} + 5}
+    delay = ${if >{$acl_c_helo_delay}{0}{$acl_c_helo_delay}}s
+
+  accept

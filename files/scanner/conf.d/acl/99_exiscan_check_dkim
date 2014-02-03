@@ -1,0 +1,10 @@
+### acl/99_exiscan_local_check_dkim
+
+exiscan_check_dkim:
+  # Set the variable acl_m_dkimbulkpass if the sender is listed in no_spamassassin_domains
+  # and we can verify the dkim signature
+  warn
+    condition               = ${lookup{$sender_address_domain}lsearch{/etc/exim4/no_spamassassin_domains} {yes}{no}}
+    dkim_signers            = $sender_address_domain
+    dkim_status             = pass
+    set acl_m_dkimbulkpass  = yes
