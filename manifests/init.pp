@@ -43,15 +43,15 @@ class exiscan (
       db_username => $sa_bayes_sql_username,
       db_password => $sa_bayes_sql_password;
     }
-    Class['exiscan::spamassassin_db'] -> Class['exiscan::spamassassin']
+    Package["spamassassin"] -> Class['exiscan::spamassassin_db'] -> Service["spamassassin"]
   }
 
   if ($greylist_local) {
     class { 'exiscan::greylist_db':
-      db_username => $sa_bayes_sql_username,
-      db_password => $sa_bayes_sql_password;
+      db_username => $greylist_sql_username,
+      db_password => $greylist_sql_password;
     }
-    Class['exiscan::spamassassin_db'] -> Class['exiscan::spamassassin']
+    Package[$exim::package] -> Class['exiscan::greylist_db'] -> Service['exim']
   }
 
   # workaround debianism/systemd fail
