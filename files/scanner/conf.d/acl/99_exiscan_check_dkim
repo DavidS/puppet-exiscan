@@ -8,3 +8,5 @@ exiscan_check_dkim:
     dkim_signers            = $sender_address_domain
     dkim_status             = pass
     set acl_m_dkimbulkpass  = yes
+
+  accept
