@@ -17,10 +17,10 @@ smtp_accept_max_per_host = 5
 smtp_connect_backlog = 50
 smtp_receive_timeout = 15m
 
-# accept mails on ssmtp and submission ports too
-daemon_smtp_ports = smtp : submission : ssmtp
-# do ssl on connect on legacy ssmtp port
-tls_on_connect_ports = ssmtp
+# accept mails on ssmtp(465) and submission ports too
+daemon_smtp_ports = smtp : submission : 465
+# do ssl on connect on legacy ssmtp port (465)
+tls_on_connect_ports = 465
 
 # require TLS for AUTH
 auth_advertise_hosts = ${if or{ \
