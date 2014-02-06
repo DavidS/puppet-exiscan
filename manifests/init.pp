@@ -9,6 +9,7 @@ class exiscan (
   $other_hostnames       = [$::fqdn],
   $relay_nets            = [],
   $relay_domains         = ["@mx_any/ignore=+localhosts"],
+  $local_delivery        = 'mail_spool',
   $listen_ipaddresses    = ['::0', '0.0.0.0'],
   $greylist_local        = false,
   # 'servers={hostname}/{database}/{user}[/{password}]'
