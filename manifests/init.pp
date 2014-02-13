@@ -22,8 +22,8 @@ class exiscan (
   validate_bool($greylist_local)
 
   $exim_sources = $exim_source_dir ? {
-    ''      => ["puppet:///modules/exiscan/default", "puppet:///modules/exiscan/scanner"],
-    default => [$exim_source_dir, "puppet:///modules/exiscan/default", "puppet:///modules/exiscan/scanner"]
+    ''      => ["puppet:///modules/exiscan/default", "puppet:///modules/exiscan/scanner", "puppet:///modules/exiscan/greylist"],
+    default => [$exim_source_dir, "puppet:///modules/exiscan/default", "puppet:///modules/exiscan/scanner", "puppet:///modules/exiscan/greylist"]
   }
 
   class {
