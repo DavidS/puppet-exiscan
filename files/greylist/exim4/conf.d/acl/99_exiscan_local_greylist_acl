@@ -2,7 +2,7 @@
 local_greylist_acl:
   # clean expired greylist records at 00 and 30 of all day minutes
   warn  condition       = ${if or {{eq {${substr{10}{2}{$tod_zulu}} }{00}}{eq {${substr{10}{2}{$tod_zulu}} }{30}} }{yes}{no}}
-        set acl_m4      = ${lookup pgsql{GREYLIST_DSN GREYLIST_CLEAN}}
+        set acl_m4      = ${lookup pgsql{GREYLIST_DSN; GREYLIST_CLEAN}}
         log_message     = clean expired greylist records
 
   # For regular deliveries, check greylist.
@@ -10,7 +10,7 @@ local_greylist_acl:
   # check greylist tuple, returning "accepted", "deferred" or "unknown"
   # in acl_m8, and the record id in acl_m9
 
-  warn  set acl_m8       = ${lookup pgsql{GREYLIST_DSN GREYLIST_TEST}{$value}{result=unknown}}
+  warn  set acl_m8       = ${lookup pgsql{GREYLIST_DSN; GREYLIST_TEST}{$value}{result=unknown}}
         # here acl_m8 = "result=x id=y"
         set acl_m9       = ${extract{id}{$acl_m8}{$value}{-1}}
         # now acl_m9 contains the record id (or -1)
@@ -23,23 +23,23 @@ local_greylist_acl:
        # if above check returned unknown (no record yet)
        condition        = ${if eq {$acl_m8} {unknown} {yes}}
        # then also add a record
-       condition        = ${lookup pgsql{GREYLIST_DSN GREYLIST_ADD}{yes}{no}}
+       condition        = ${lookup pgsql{GREYLIST_DSN; GREYLIST_ADD}{yes}{no}}
 
   # check if the triple is still blocked
   accept
        # if above check returned deferred then defer
        condition        = ${if eq{$acl_m8} {deferred} {yes}}
        # and note it down
-       condition        = ${lookup pgsql{GREYLIST_DSN GREYLIST_DEFER_HIT}{yes}{yes}}
+       condition        = ${lookup pgsql{GREYLIST_DSN; GREYLIST_DEFER_HIT}{yes}{yes}}
 
   # use a warn verb to count records that were hit
-  warn  condition        = ${lookup pgsql{GREYLIST_DSN GREYLIST_OK_COUNT}}
+  warn  condition        = ${lookup pgsql{GREYLIST_DSN; GREYLIST_OK_COUNT}}
 
   # use a warn verb to set a new expire time on automatic records,
   # but only if the mail was not a bounce, otherwise set to now().
   warn  !senders         = : postmaster@* : Mailer-Daemon@*
-        condition        = ${lookup pgsql{GREYLIST_DSN GREYLIST_OK_NEWTIME}}
+        condition        = ${lookup pgsql{GREYLIST_DSN; GREYLIST_OK_NEWTIME}}
   warn  senders          = : postmaster@* : Mailer-Daemon@*
-        condition        = ${lookup pgsql{GREYLIST_DSN GREYLIST_OK_BOUNCE}}
+        condition        = ${lookup pgsql{GREYLIST_DSN; GREYLIST_OK_BOUNCE}}
   deny
 .endif
