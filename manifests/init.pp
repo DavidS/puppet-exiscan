@@ -6,6 +6,10 @@ class exiscan (
   $sa_bayes_sql_username,
   $sa_bayes_sql_password = '',
   $exim_source_dir       = '',
+  $default_exim_sources  = [
+    "puppet:///modules/exiscan/default",
+    "puppet:///modules/exiscan/scanner",
+    "puppet:///modules/exiscan/greylist/exim4"],
   $other_hostnames       = [$::fqdn],
   $relay_nets            = [],
   $relay_domains         = ["@mx_any/ignore=+localhosts"],
@@ -22,8 +26,8 @@ class exiscan (
   validate_bool($greylist_local)
 
   $exim_sources = $exim_source_dir ? {
-    ''      => ["puppet:///modules/exiscan/default", "puppet:///modules/exiscan/scanner", "puppet:///modules/exiscan/greylist"],
-    default => [$exim_source_dir, "puppet:///modules/exiscan/default", "puppet:///modules/exiscan/scanner", "puppet:///modules/exiscan/greylist"]
+    ''      => $default_exim_sources,
+    default => flatten([$exim_source_dir, $default_exim_sources])
   }
 
   class {
