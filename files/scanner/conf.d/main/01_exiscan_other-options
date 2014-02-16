@@ -2,8 +2,6 @@
 
 # enable TLS/SSL
 MAIN_TLS_ENABLE = true
-# at least try to verify TLS connections
-MAIN_TLS_TRY_VERIFY_HOSTS = *
 
 # disable frozen notifications
 MAIN_FREEZE_TELL =
