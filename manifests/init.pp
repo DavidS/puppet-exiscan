@@ -5,6 +5,7 @@ class exiscan (
   $sa_bayes_sql_dsn,
   $sa_bayes_sql_username,
   $sa_bayes_sql_password = '',
+  $sa_trusted_networks   = $::ipaddress,
   $exim_source_dir       = '',
   $default_exim_sources  = [
     "puppet:///modules/exiscan/default",
@@ -40,7 +41,8 @@ class exiscan (
     'exiscan::spamassassin':
       bayes_sql_dsn      => $sa_bayes_sql_dsn,
       bayes_sql_username => $sa_bayes_sql_username,
-      bayes_sql_password => $sa_bayes_sql_password;
+      bayes_sql_password => $sa_bayes_sql_password,
+      trusted_networks   => $sa_trusted_networks;
   }
 
   if ($sa_bayes_sql_local) {

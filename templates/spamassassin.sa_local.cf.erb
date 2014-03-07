@@ -22,7 +22,7 @@
 #   server (i.e. not spammers)
 #
 # trusted_networks 212.17.35.
-trusted_networks <%= @trusted_networks %>
+trusted_networks <%= [ @trusted_networks ].flatten.compact.join(" ") %>
 
 
 #   Set file-locking method (flock is not safe over NFS, but is faster)
