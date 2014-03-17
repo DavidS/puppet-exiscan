@@ -38,12 +38,12 @@ class exiscan::spamassassin (
       notify  => Service["spamassassin"];
 
     "/etc/spamassassin/custom_rules.cf":
-      ensure => present,
-      mode   => 0644,
-      owner  => root,
-      group  => root,
+      ensure  => present,
+      mode    => 0644,
+      owner   => root,
+      group   => root,
       require => Package["spamassassin"],
-      notify => Service["spamassassin"];
+      notify  => Service["spamassassin"];
 
     "/var/run/spamd":
       ensure  => directory,
@@ -68,6 +68,21 @@ class exiscan::spamassassin (
       group   => 'clamav',
       require => [Package[$exim::package], Package["clamav-daemon"]],
       notify  => Service["exim4"];
+
+    "/etc/systemd/system/spamassassin.service":
+      ensure  => present,
+      source  => "puppet:///modules/exiscan/spamassassin/spamassassin.service",
+      mode    => 0644,
+      owner   => root,
+      group   => root,
+      require => Package["spamassassin"],
+      notify  => Service["spamassassin"];
+
+    "/etc/systemd/system/multi-user.target.wants/spamassassin.service":
+      ensure  => symlink,
+      target  => "/etc/systemd/system/spamassassin.service",
+      require => Package["spamassassin"],
+      notify  => Service["spamassassin"];
   }
 
   if ($custom_rules_content != '') {

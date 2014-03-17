@@ -1,0 +1,9 @@
+[Unit]
+Description=Perl-based spam filter using text analysis
+
+[Service]
+ExecStart=/usr/sbin/spamd --create-prefs --max-children 15 --helper-home-dir --username debian-spamd --allow-tell --socketpath=/var/run/spamd.sock --socketowner=debian-spamd --socketgroup=Debian-exim --socketmode=0660 --log-timestamp-fmt=
+ExecReload=/bin/kill -HUP $MAINPID
+
+[Install]
+WantedBy=multi-user.target
