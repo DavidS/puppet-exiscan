@@ -1,0 +1,15 @@
+#!/bin/bash
+
+SPOOL="/var/spool/junk-sync"
+JUNK_BOX="Junk"
+
+mkdir -p "$SPOOL"
+chmod 0751 "$SPOOL"
+for i in <%= @junk_submitters.join(" ") %>; do
+	mkdir -p "$SPOOL/$i"
+	chown -R "$i" "$SPOOL/$i"
+	dsync -u "$i" -m "$JUNK_BOX" backup "mbox:$SPOOL/$i"
+	su - debian-spamd -c 'sa-learn --spam --mbox' < "$SPOOL/$i/$JUNK_BOX"
+	#rm -rf "$SPOOL/$i"
+done
+

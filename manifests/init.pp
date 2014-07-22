@@ -21,7 +21,8 @@ class exiscan (
   $greylist_dsn,
   $greylist_sql_username,
   $greylist_sql_password = '',
-  $dkim_domain           = $::domain) {
+  $dkim_domain           = $::domain,
+  $junk_submitters       = []) {
   validate_bool($master)
   validate_bool($sa_bayes_sql_local)
   validate_bool($greylist_local)
@@ -80,5 +81,11 @@ class exiscan (
       mode    => 0644,
       owner   => root,
       group   => 'Debian-exim';
+
+    "/etc/cron.daily/exiscan-junk-sync":
+      content => template("exiscan/junk-sync.erb"),
+      mode    => 0755,
+      owner   => root,
+      group   => root;
   }
 }
