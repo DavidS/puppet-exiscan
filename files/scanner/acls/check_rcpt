@@ -47,7 +47,7 @@ deny
 # are relaying) cannot be verified. This slows down spamruns, virii
 # and address brute forcing.
 deny
-  acl = acl_local_deny_exceptions
+  !acl = acl_local_deny_exceptions
   domains = +relay_to_domains
   message = unknown user
   verify = recipient/callout=20s,defer_ok,use_sender
