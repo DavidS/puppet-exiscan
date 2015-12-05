@@ -94,9 +94,9 @@ class exiscan (
     file {
       "/etc/exim4/dkim.private.key":
         source => $dkim_private_key,
-        mode   => 0600,
+        mode   => 0440,
         owner  => root,
-        group  => root;
+        group  => Debian-exim;
     }
   }
 }
