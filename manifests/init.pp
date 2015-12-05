@@ -22,6 +22,7 @@ class exiscan (
   $greylist_sql_username,
   $greylist_sql_password = '',
   $dkim_domain           = $::domain,
+  $dkim_private_key      = undef,
   $junk_submitters       = []) {
   validate_bool($master)
   validate_bool($sa_bayes_sql_local)
@@ -87,5 +88,15 @@ class exiscan (
       mode    => 0755,
       owner   => root,
       group   => root;
+  }
+
+  if $dkim_private_key {
+    file {
+      "/etc/exim4/dkim.private.key":
+        source => $dkim_private_key,
+        mode   => 0600,
+        owner  => root,
+        group  => root;
+    }
   }
 }
