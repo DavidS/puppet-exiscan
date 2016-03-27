@@ -1,6 +1,6 @@
 fixtures:
     symlinks:
-      davids-exiscan: "#{source_dir}"
+      exiscan: "#{source_dir}"
     repositories:
       stdlib:
         repo: https://github.com/puppetlabs/puppetlabs-stdlib.git
