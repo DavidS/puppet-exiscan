@@ -23,7 +23,7 @@ class exiscan::spamassassin_db (
       file {
         "/var/lib/spamd-dbimport":
           ensure => directory,
-          mode   => 0700,
+          mode   => '0700',
           owner  => $runtime_user;
 
         'spamassassin_3_2_2_initial.sql':
@@ -31,7 +31,7 @@ class exiscan::spamassassin_db (
           path   => '/var/lib/spamd-dbimport/spamassassin_3_2_2_initial.sql',
           owner  => root,
           group  => root,
-          mode   => 644,
+          mode   => '644',
           source => 'puppet:///modules/exiscan/spamassassin/postgres/spamassassin_3_2_2_initial.sql',
       }
 

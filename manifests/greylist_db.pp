@@ -22,7 +22,7 @@ class exiscan::greylist_db (
       file {
         "/var/lib/greylist-dbimport":
           ensure => directory,
-          mode   => 0700,
+          mode   => '0700',
           owner  => $runtime_user;
 
         'greylist_initial.sql':
@@ -30,7 +30,7 @@ class exiscan::greylist_db (
           path   => '/var/lib/greylist-dbimport/greylist_initial.sql',
           owner  => root,
           group  => root,
-          mode   => 644,
+          mode   => '644',
           source => 'puppet:///modules/exiscan/greylist/postgres/greylist_initial.sql',
       }
 

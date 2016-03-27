@@ -2,7 +2,8 @@ source "https://rubygems.org"
 
 group :test do
     gem "rake"
-    gem "puppet", ENV['PUPPET_VERSION'] || '~> 3.8'
+    # gem "puppet", ENV['PUPPET_GEM_VERSION'] || '~> 3.0'
+    gem "puppet", ENV['PUPPET_GEM_VERSION'] || '~> 4.0'
     gem "rspec-puppet", :git => 'https://github.com/rodjek/rspec-puppet.git'
     gem "puppetlabs_spec_helper"
     gem 'rspec-puppet-utils', :git => 'https://github.com/Accuity/rspec-puppet-utils.git'
@@ -24,5 +25,5 @@ group :development do
     gem "travis-lint"
     gem "puppet-blacksmith"
     gem "guard-rake"
-    gem 'puppet-retrospec'#, git: 'https://github.com/nwops/puppet-retrospec.git', ref: 'master'
+    #gem 'puppet-retrospec'#, git: 'https://github.com/nwops/puppet-retrospec.git', ref: 'master'
 end

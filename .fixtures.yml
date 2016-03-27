@@ -1,8 +1,11 @@
 fixtures:
     symlinks:
       exiscan: "#{source_dir}"
-    repositories:
-      stdlib:
-        repo: https://github.com/puppetlabs/puppetlabs-stdlib.git
-        ref: 4.3.2
+      tp: "#{source_dir}/../puppet-tp"
     forge_modules:
+      concat: 'ripienaar/concat'
+      postgresql: "example42/postgresql"
+      puppi: "example42/puppi"
+      stdlib: "puppetlabs/stdlib"
+      tinydata: "example42/tinydata"
+      # tp: "example42/tp"

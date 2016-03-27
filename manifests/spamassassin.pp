@@ -6,7 +6,6 @@ class exiscan::spamassassin (
   $bayes_sql_password   = 'spamassassin',
   $custom_rules_content = '',
   $custom_rules_source  = '') {
-  include exim
 
   $spamd_packages = ["spamassassin", "libmail-dkim-perl", "clamav-daemon", "libclass-dbi-pg-perl", "spf-tools-perl"]
 
@@ -22,7 +21,7 @@ class exiscan::spamassassin (
     "/etc/default/spamassassin":
       ensure  => present,
       source  => "puppet:///modules/exiscan/spamassassin/sa_default",
-      mode    => 0644,
+      mode    => '0644',
       owner   => root,
       group   => root,
       require => Package["spamassassin"],
@@ -31,7 +30,7 @@ class exiscan::spamassassin (
     "/etc/spamassassin/local.cf":
       ensure  => present,
       content => template("exiscan/spamassassin.sa_local.cf.erb"),
-      mode    => 0644,
+      mode    => '0644',
       owner   => root,
       group   => root,
       require => Package["spamassassin"],
@@ -39,7 +38,7 @@ class exiscan::spamassassin (
 
     "/etc/spamassassin/custom_rules.cf":
       ensure  => present,
-      mode    => 0644,
+      mode    => '0644',
       owner   => root,
       group   => root,
       require => Package["spamassassin"],
@@ -47,7 +46,7 @@ class exiscan::spamassassin (
 
     "/var/run/spamd":
       ensure  => directory,
-      mode    => 0750,
+      mode    => '0750',
       owner   => 'debian-spamd',
       group   => 'debian-spamd',
       require => Package["spamassassin"],
@@ -55,24 +54,24 @@ class exiscan::spamassassin (
 
     "/var/spool/exim4":
       ensure  => directory,
-      mode    => 0750,
+      mode    => '0750',
       owner   => 'Debian-exim',
       group   => 'clamav',
-      require => [Package[$exim::package], Package["clamav-daemon"]],
-      notify  => Service["exim4"];
+      require => [Package[exim], Package["clamav-daemon"]],
+      notify  => Service[exim];
 
     "/var/spool/exim4/scan":
       ensure  => directory,
-      mode    => 2750,
+      mode    => '2750',
       owner   => 'Debian-exim',
       group   => 'clamav',
-      require => [Package[$exim::package], Package["clamav-daemon"]],
-      notify  => Service["exim4"];
+      require => [Package[exim], Package["clamav-daemon"]],
+      notify  => Service[exim];
 
     "/etc/systemd/system/spamassassin.service":
       ensure  => present,
       source  => "puppet:///modules/exiscan/spamassassin/spamassassin.service",
-      mode    => 0644,
+      mode    => '0644',
       owner   => root,
       group   => root,
       require => Package["spamassassin"],
