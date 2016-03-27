@@ -7,14 +7,133 @@
 # By default this schema is generic and only covers basic parameter types.
 # You should update the schema to match your expected data types in your puppet classes
 # or anywhere else you call hiera using the hiera() function.
-# This schema contains 0 entries.
----
-type: map
-mapping:
-  hostclass:
-    type: map
-    mapping: {}
-  definition:
-    type: map
-    mapping: {}
-
+# This schema contains 36 entries.
+--- 
+  type: map
+  mapping: 
+    hostclass: 
+      type: map
+      mapping: 
+        "exiscan::greylist_db::db_type": 
+          type: any
+          required: false
+        "exiscan::greylist_db::exim_ipaddress": 
+          type: str
+          required: false
+        "exiscan::greylist_db::db_name": 
+          type: str
+          required: false
+        "exiscan::greylist_db::db_username": 
+          type: str
+          required: false
+        "exiscan::greylist_db::db_password": 
+          type: any
+          required: true
+        "exiscan::master": 
+          type: bool
+          required: false
+        "exiscan::sa_bayes_sql_local": 
+          type: bool
+          required: false
+        "exiscan::sa_bayes_sql_dsn": 
+          type: any
+          required: true
+        "exiscan::sa_bayes_sql_username": 
+          type: any
+          required: true
+        "exiscan::sa_bayes_sql_password": 
+          type: str
+          required: false
+        "exiscan::sa_trusted_networks": 
+          type: any
+          required: false
+        "exiscan::exim_source_dir": 
+          type: str
+          required: false
+        "exiscan::default_exim_sources": 
+          type: seq
+          sequence: 
+            - type: str
+          required: false
+        "exiscan::other_hostnames": 
+          type: seq
+          sequence: 
+            - type: str
+          required: false
+        "exiscan::relay_nets": 
+          type: seq
+          sequence: 
+            - type: str
+          required: false
+        "exiscan::relay_domains": 
+          type: seq
+          sequence: 
+            - type: str
+          required: false
+        "exiscan::local_delivery": 
+          type: str
+          required: false
+        "exiscan::listen_ipaddresses": 
+          type: seq
+          sequence: 
+            - type: str
+          required: false
+        "exiscan::greylist_local": 
+          type: bool
+          required: false
+        "exiscan::greylist_dsn": 
+          type: any
+          required: true
+        "exiscan::greylist_sql_username": 
+          type: any
+          required: true
+        "exiscan::greylist_sql_password": 
+          type: str
+          required: false
+        "exiscan::dkim_domain": 
+          type: any
+          required: false
+        "exiscan::dkim_private_key": 
+          type: any
+          required: false
+        "exiscan::junk_submitters": 
+          type: seq
+          sequence: 
+            - type: str
+          required: false
+        "exiscan::spamassassin_db::db_type": 
+          type: any
+          required: false
+        "exiscan::spamassassin_db::exim_ipaddress": 
+          type: str
+          required: false
+        "exiscan::spamassassin_db::db_name": 
+          type: str
+          required: false
+        "exiscan::spamassassin_db::db_username": 
+          type: str
+          required: false
+        "exiscan::spamassassin_db::db_password": 
+          type: any
+          required: true
+        "exiscan::spamassassin::trusted_networks": 
+          type: any
+          required: false
+        "exiscan::spamassassin::bayes_sql_dsn": 
+          type: any
+          required: true
+        "exiscan::spamassassin::bayes_sql_username": 
+          type: str
+          required: false
+        "exiscan::spamassassin::bayes_sql_password": 
+          type: str
+          required: false
+        "exiscan::spamassassin::custom_rules_content": 
+          type: str
+          required: false
+        "exiscan::spamassassin::custom_rules_source": 
+          type: str
+          required: false
+    definition: 
+      type: map
+      mapping: {}
