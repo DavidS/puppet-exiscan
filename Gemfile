@@ -24,6 +24,5 @@ group :development do
     gem "travis-lint"
     gem "puppet-blacksmith"
     gem "guard-rake"
-    gem 'safe_yaml', require: false
     gem 'puppet-retrospec'#, git: 'https://github.com/nwops/puppet-retrospec.git', ref: 'master'
 end
