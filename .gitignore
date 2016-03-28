@@ -1,3 +1,5 @@
 /.bundle/
+/.vagrant
 /Gemfile.lock
+/log
 /spec/fixtures

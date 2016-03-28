@@ -16,6 +16,7 @@ end
 group :integration do
     gem "beaker", :git => 'https://github.com/puppetlabs/beaker.git'
     gem "beaker-rspec", :git => 'https://github.com/puppetlabs/beaker-rspec.git'
+    gem "beaker-puppet_install_helper"
     gem "vagrant-wrapper"
     gem 'serverspec'
 end
