@@ -5,7 +5,7 @@ group :test do
     # gem "puppet", ENV['PUPPET_GEM_VERSION'] || '~> 3.0'
     gem "puppet", ENV['PUPPET_GEM_VERSION'] || '~> 4.0'
     gem "rspec-puppet", :git => 'https://github.com/rodjek/rspec-puppet.git'
-    gem "puppetlabs_spec_helper"
+    gem "puppetlabs_spec_helper", :git => 'https://github.com/puppetlabs/puppetlabs_spec_helper.git'
     gem 'rspec-puppet-utils', :git => 'https://github.com/Accuity/rspec-puppet-utils.git'
     gem 'hiera-puppet-helper', :git => 'https://github.com/bobtfish/hiera-puppet-helper.git'
     gem "metadata-json-lint"

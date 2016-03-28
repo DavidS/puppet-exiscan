@@ -17,11 +17,11 @@ class exiscan::spamassassin_db (
         address  => "${exim_ipaddress}/32",
         encoding => 'UTF8',
         locale   => 'en_US.UTF-8',
-        template => "template0";
+        template => 'template0';
       }
 
       file {
-        "/var/lib/spamd-dbimport":
+        '/var/lib/spamd-dbimport':
           ensure => directory,
           mode   => '0700',
           owner  => $runtime_user;
@@ -31,7 +31,7 @@ class exiscan::spamassassin_db (
           path   => '/var/lib/spamd-dbimport/spamassassin_3_2_2_initial.sql',
           owner  => root,
           group  => root,
-          mode   => '644',
+          mode   => '0644',
           source => 'puppet:///modules/exiscan/spamassassin/postgres/spamassassin_3_2_2_initial.sql',
       }
 
@@ -40,11 +40,14 @@ class exiscan::spamassassin_db (
         database        => $db_name,
         extract_command => false,
         user            => $runtime_user,
-        log             => "/var/lib/spamd-dbimport/log",
-        errorlog        => "/var/lib/spamd-dbimport/errorlog",
-        flagfile        => "/var/lib/spamd-dbimport/flagfile",
+        log             => '/var/lib/spamd-dbimport/log',
+        errorlog        => '/var/lib/spamd-dbimport/errorlog',
+        flagfile        => '/var/lib/spamd-dbimport/flagfile',
         require         => [File['spamassassin_3_2_2_initial.sql'], Postgresql::Dbcreate[$db_name]],
       }
+    }
+    default: {
+      fail("Database type ${db_type} not supported")
     }
   }
 }

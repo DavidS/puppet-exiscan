@@ -8,12 +8,12 @@ class exiscan (
   $sa_trusted_networks   = $::ipaddress,
   $exim_source_dir       = '',
   $default_exim_sources  = [
-    "puppet:///modules/exiscan/default",
-    "puppet:///modules/exiscan/scanner",
-    "puppet:///modules/exiscan/greylist/exim4"],
+    'puppet:///modules/exiscan/default',
+    'puppet:///modules/exiscan/scanner',
+    'puppet:///modules/exiscan/greylist/exim4'],
   $other_hostnames       = [$::fqdn],
   $relay_nets            = [],
-  $relay_domains         = ["@mx_any/ignore=+localhosts"],
+  $relay_domains         = ['@mx_any/ignore=+localhosts'],
   $local_delivery        = 'mail_spool',
   $listen_ipaddresses    = ['::0', '0.0.0.0'],
   $greylist_local        = false,
@@ -33,7 +33,7 @@ class exiscan (
     default => flatten([$exim_source_dir, $default_exim_sources])
   }
 
-  tp::install { exim:
+  tp::install { 'exim':
     settings_hash => { package_name => 'exim4-daemon-heavy' }
   }
 
@@ -51,15 +51,15 @@ class exiscan (
       trusted_networks   => $sa_trusted_networks;
   }
 
-  if ($sa_bayes_sql_local) {
+  if $sa_bayes_sql_local {
     class { 'exiscan::spamassassin_db':
       db_username => $sa_bayes_sql_username,
       db_password => $sa_bayes_sql_password;
     }
-    Package["spamassassin"] -> Class['exiscan::spamassassin_db'] -> Service["spamassassin"]
+    Package['spamassassin'] -> Class['exiscan::spamassassin_db'] -> Service['spamassassin']
   }
 
-  if ($greylist_local) {
+  if $greylist_local {
     class { 'exiscan::greylist_db':
       db_username => $greylist_sql_username,
       db_password => $greylist_sql_password;
@@ -69,26 +69,26 @@ class exiscan (
 
   # workaround debianism/systemd fail
   # update-exim4.conf failures are not recognized by the default module
-  Package[exim] ~> exec { "/usr/sbin/update-exim4.conf":
+  Package[exim] ~> exec { '/usr/sbin/update-exim4.conf':
     refreshonly => true,
     logoutput   => on_failure;
   } ~> Service[exim]
 
   file {
-    "/etc/exim4/conf.d/main/01_exiscan_greylist_dsn":
+    '/etc/exim4/conf.d/main/01_exiscan_greylist_dsn':
       content => "GREYLIST_DSN = ${greylist_dsn}\n",
       mode    => '0640',
       owner   => root,
       group   => 'Debian-exim';
 
-    "/etc/exim4/conf.d/main/01_exiscan_dkim-options":
-      content => template("exiscan/dkim-options.erb"),
+    '/etc/exim4/conf.d/main/01_exiscan_dkim-options':
+      content => template('exiscan/dkim-options.erb'),
       mode    => '0644',
       owner   => root,
       group   => 'Debian-exim';
 
-    "/etc/cron.daily/exiscan-junk-sync":
-      content => template("exiscan/junk-sync.erb"),
+    '/etc/cron.daily/exiscan-junk-sync':
+      content => template('exiscan/junk-sync.erb'),
       mode    => '0755',
       owner   => root,
       group   => root;
@@ -96,7 +96,7 @@ class exiscan (
 
   if $dkim_private_key {
     file {
-      "/etc/exim4/dkim.private.key":
+      '/etc/exim4/dkim.private.key':
         source => $dkim_private_key,
         mode   => '0440',
         owner  => root,

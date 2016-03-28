@@ -16,11 +16,11 @@ class exiscan::greylist_db (
         address  => "${exim_ipaddress}/32",
         encoding => 'UTF8',
         locale   => 'en_US.UTF-8',
-        template => "template0";
+        template => 'template0';
       }
 
       file {
-        "/var/lib/greylist-dbimport":
+        '/var/lib/greylist-dbimport':
           ensure => directory,
           mode   => '0700',
           owner  => $runtime_user;
@@ -30,7 +30,7 @@ class exiscan::greylist_db (
           path   => '/var/lib/greylist-dbimport/greylist_initial.sql',
           owner  => root,
           group  => root,
-          mode   => '644',
+          mode   => '0644',
           source => 'puppet:///modules/exiscan/greylist/postgres/greylist_initial.sql',
       }
 
@@ -39,11 +39,14 @@ class exiscan::greylist_db (
         database        => $db_name,
         extract_command => false,
         user            => $runtime_user,
-        log             => "/var/lib/greylist-dbimport/log",
-        errorlog        => "/var/lib/greylist-dbimport/errorlog",
-        flagfile        => "/var/lib/greylist-dbimport/flagfile",
+        log             => '/var/lib/greylist-dbimport/log',
+        errorlog        => '/var/lib/greylist-dbimport/errorlog',
+        flagfile        => '/var/lib/greylist-dbimport/flagfile',
         require         => [File['greylist_initial.sql'], Postgresql::Dbcreate[$db_name]],
       }
+    }
+    default: {
+      fail("Database type ${db_type} not supported")
     }
   }
 }
