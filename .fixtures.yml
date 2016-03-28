@@ -1,7 +1,6 @@
 fixtures:
     symlinks:
       exiscan: "#{source_dir}"
-      tp: "#{source_dir}/../puppet-tp"
     forge_modules:
       concat: 'ripienaar/concat'
       postgresql: "example42/postgresql"
@@ -9,3 +8,7 @@ fixtures:
       stdlib: "puppetlabs/stdlib"
       tinydata: "example42/tinydata"
       # tp: "example42/tp"
+    repositories:
+      tp:
+        repo: "https://github.com/DavidS/puppet-tp.git"
+        branch: "default-names"
