@@ -1,0 +1,16 @@
+HOSTS:
+  debian-8-x64:
+    roles:
+      - agent
+      - default
+    platform: debian-8-amd64
+    image: debian:8
+    hypervisor: docker
+    docker_preserve_image: true
+    docker_cmd: '["/sbin/init"]'
+    docker_image_commands:
+      - 'apt-get install -y net-tools wget locales'
+      - 'locale-gen en_US.UTF-8'
+CONFIG:
+  log_level: debug
+  trace_limit: 200
